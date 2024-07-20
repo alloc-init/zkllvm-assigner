@@ -24,10 +24,11 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef ZKLLVM_ASSIGNER_INCLUDE_NIL_BLUEPRINT_COMPONENT_MOCKUPS_IS_IN_G1_HPP_
-#define ZKLLVM_ASSIGNER_INCLUDE_NIL_BLUEPRINT_COMPONENT_MOCKUPS_IS_IN_G1_HPP_
+#ifndef ZKLLVM_ASSIGNER_INCLUDE_BLUEPRINT_COMPONENT_MOCKUPS_IS_IN_G1_HPP_
+#define ZKLLVM_ASSIGNER_INCLUDE_BLUEPRINT_COMPONENT_MOCKUPS_IS_IN_G1_HPP_
 
-#include <nil/crypto3/multiprecision/cpp_int_modular/literals.hpp>
+#include <boost/multiprecision/cpp_int/literals.hpp>
+
 #include <nil/crypto3/algebra/matrix/matrix.hpp>
 #include <nil/crypto3/algebra/fields/pallas/base_field.hpp>
 #include <nil/crypto3/algebra/fields/vesta/base_field.hpp>
@@ -36,7 +37,6 @@
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/component.hpp>
 #include <nil/blueprint/manifest.hpp>
-
 
 namespace nil {
     namespace blueprint {
@@ -51,7 +51,6 @@ namespace nil {
 
             public:
                 using component_type = plonk_component<BlueprintFieldType>;
-
 
                 constexpr static const std::size_t gates_amount = 0;
                 const std::size_t rows_amount = get_rows_amount(this->witness_amount());
@@ -72,14 +71,11 @@ namespace nil {
                     return manifest;
                 }
 
-
                 static manifest_type get_manifest() {
                     using manifest_param = nil::blueprint::manifest_param;
                     using manifest_single_value_param = nil::blueprint::manifest_single_value_param;
-                    static manifest_type manifest = manifest_type(
-                        std::shared_ptr<manifest_param>(new manifest_single_value_param(15)),
-                        false
-                    );
+                    static manifest_type manifest =
+                        manifest_type(std::shared_ptr<manifest_param>(new manifest_single_value_param(15)), false);
                     return manifest;
                 }
 
@@ -100,8 +96,8 @@ namespace nil {
                 struct result_type {
                     var output;
 
-                    result_type(const is_in_g1<crypto3::zk::snark::plonk_constraint_system<
-                        BlueprintFieldType>, FieldType> &component,
+                    result_type(const is_in_g1<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
+                                               FieldType> &component,
                                 std::uint32_t start_row_index) {
                         output = var(component.W(0), start_row_index, false);
                     }
@@ -110,7 +106,6 @@ namespace nil {
                         return {output};
                     }
                 };
-
 
                 template<typename ContainerType>
                 explicit is_in_g1(ContainerType witness) : component_type(witness, {}, {}, get_manifest()) {};
@@ -125,50 +120,38 @@ namespace nil {
                          std::initializer_list<typename component_type::constant_container_type::value_type>
                              constants,
                          std::initializer_list<typename component_type::public_input_container_type::value_type>
-                             public_inputs) :
-                    component_type(witnesses, constants, public_inputs, get_manifest()) {};
+                             public_inputs) : component_type(witnesses, constants, public_inputs, get_manifest()) {};
             };
 
             template<typename BlueprintFieldType, typename FieldType>
-            using plonk_is_in_g1 =
-                is_in_g1<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
-                         FieldType>;
+            using plonk_is_in_g1 = is_in_g1<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>, FieldType>;
 
             template<typename BlueprintFieldType, typename FieldType>
-            typename plonk_is_in_g1<BlueprintFieldType, FieldType>::result_type
-                generate_assignments(
-                    const plonk_is_in_g1<BlueprintFieldType, FieldType> &component,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
-                        &assignment,
-                    const typename plonk_is_in_g1<BlueprintFieldType, FieldType>::input_type
-                        instance_input,
-                    const std::uint32_t start_row_index) {
+            typename plonk_is_in_g1<BlueprintFieldType, FieldType>::result_type generate_assignments(
+                const plonk_is_in_g1<BlueprintFieldType, FieldType> &component,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                const typename plonk_is_in_g1<BlueprintFieldType, FieldType>::input_type instance_input,
+                const std::uint32_t start_row_index) {
 
                 using component_type = plonk_is_in_g1<BlueprintFieldType, FieldType>;
 
                 assignment.witness(component.W(0), start_row_index) = 1;
 
-                return typename plonk_is_in_g1<BlueprintFieldType, FieldType>::result_type(
-                    component, start_row_index);
+                return typename plonk_is_in_g1<BlueprintFieldType, FieldType>::result_type(component, start_row_index);
             }
-
 
             template<typename BlueprintFieldType, typename FieldType>
-            typename plonk_is_in_g1<BlueprintFieldType, FieldType>::result_type
-                generate_circuit(
-                    const plonk_is_in_g1<BlueprintFieldType, FieldType> &component,
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
-                        &assignment,
-                    const typename plonk_is_in_g1<BlueprintFieldType, FieldType>::input_type
-                        &instance_input,
-                    const std::size_t start_row_index) {
+            typename plonk_is_in_g1<BlueprintFieldType, FieldType>::result_type generate_circuit(
+                const plonk_is_in_g1<BlueprintFieldType, FieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                const typename plonk_is_in_g1<BlueprintFieldType, FieldType>::input_type &instance_input,
+                const std::size_t start_row_index) {
 
-                return typename plonk_is_in_g1<BlueprintFieldType, FieldType>::result_type(
-                    component, start_row_index);
+                return typename plonk_is_in_g1<BlueprintFieldType, FieldType>::result_type(component, start_row_index);
             }
         }    // namespace components
-    }        // namespace blueprint
+    }    // namespace blueprint
 }    // namespace nil
 
 #endif    // ZKLLVM_ASSIGNER_INCLUDE_NIL_BLUEPRINT_COMPONENT_MOCKUPS_IS_IN_G1_HPP_

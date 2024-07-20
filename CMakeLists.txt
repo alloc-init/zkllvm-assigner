@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.17.0)
 
 list(APPEND CMAKE_MODULE_PATH
-     "${CMAKE_CURRENT_LIST_DIR}/cmake"
-     "${CMAKE_CURRENT_LIST_DIR}/cmake/packages"
-     "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/share/modules/cmake")
+        "${CMAKE_CURRENT_LIST_DIR}/cmake"
+        "${CMAKE_CURRENT_LIST_DIR}/cmake/packages"
+        "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/share/modules/cmake")
 
 include(CMConfig)
 include(CMSetupVersion)
@@ -25,7 +25,7 @@ if(UNIX AND BUILD_WITH_PROCPS)
 endif()
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-    include/nil/crypto3/zk/components/algebra/curves/edwards/r1cs/element_g1.hpp)
+        include/nil/crypto3/zk/components/algebra/curves/edwards/r1cs/element_g1.hpp)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES)
 
@@ -38,23 +38,41 @@ cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_
 add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
 
 set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
-                      EXPORT_NAME ${CURRENT_PROJECT_NAME})
+        EXPORT_NAME ${CURRENT_PROJECT_NAME})
 
 target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                           "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-                           "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
-                           ${Boost_INCLUDE_DIRS})
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+        "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
+
+        ${Boost_INCLUDE_DIRS})
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                      LLVMIRReader
-                      LLVMCore
-                      LLVMSupport
-                      ${Boost_LIBRARIES}
-                      crypto3::all)
+        LLVMIRReader
+        LLVMCore
+        LLVMSupport
+
+        ${Boost_LIBRARIES}
+
+        crypto3::algebra
+        crypto3::block
+        crypto3::blueprint
+        crypto3::codec
+        crypto3::math
+        crypto3::multiprecision
+        crypto3::pkpad
+        crypto3::pubkey
+        crypto3::random
+        crypto3::zk
+
+        crypto3::marshalling-core
+        crypto3::marshalling-algebra
+        crypto3::marshalling-multiprecision
+        crypto3::marshalling-zk
+)
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
-          INCLUDE include
-          NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
+        INCLUDE include
+        NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
 include(CMTest)
 cm_add_test_subdirectory(test)

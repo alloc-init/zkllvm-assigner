@@ -10,10 +10,24 @@
 include(CMTest)
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
-                       LLVMIRReader
-                       LLVMCore
-                       LLVMSupport
-                       ${Boost_LIBRARIES})
+
+        ${CMAKE_WORKSPACE_NAME}::algebra
+        ${CMAKE_WORKSPACE_NAME}::blueprint
+        ${CMAKE_WORKSPACE_NAME}::hash
+        ${CMAKE_WORKSPACE_NAME}::math
+        ${CMAKE_WORKSPACE_NAME}::multiprecision
+        ${CMAKE_WORKSPACE_NAME}::random
+        ${CMAKE_WORKSPACE_NAME}::zk
+        ${CMAKE_WORKSPACE_NAME}::marshalling-core
+        ${CMAKE_WORKSPACE_NAME}::marshalling-algebra
+        ${CMAKE_WORKSPACE_NAME}::marshalling-multiprecision
+        ${CMAKE_WORKSPACE_NAME}::marshalling-zk
+
+        LLVMIRReader
+        LLVMCore
+        LLVMSupport
+
+        ${Boost_LIBRARIES})
 
 macro(define_assigner_test test)
     string(REPLACE "/" "_" full_test_name zkllvm_assigner_${test})
@@ -21,18 +35,18 @@ macro(define_assigner_test test)
     cm_test(NAME ${full_test_name} SOURCES ${test}.cpp)
 
     target_include_directories(${full_test_name} PRIVATE
-                               ${CMAKE_CURRENT_SOURCE_DIR}/include
-                               ${CMAKE_BINARY_DIR}/include
-                               ${CMAKE_SOURCE_DIR}/libs/circifier/llvm/include
-                               ${CMAKE_BINARY_DIR}/libs/circifier/llvm/include
+            ${CMAKE_CURRENT_SOURCE_DIR}/include
+            ${CMAKE_BINARY_DIR}/include
+            ${CMAKE_SOURCE_DIR}/libs/circifier/llvm/include
+            ${CMAKE_BINARY_DIR}/libs/circifier/llvm/include
 
-                               ${Boost_INCLUDE_DIRS})
+            ${Boost_INCLUDE_DIRS})
 
     set_target_properties(${full_test_name} PROPERTIES CXX_STANDARD 17)
 
-    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         target_compile_options(${full_test_name} PRIVATE "-fconstexpr-steps=2147483647")
-    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         target_compile_options(${full_test_name} PRIVATE "-fconstexpr-ops-limit=4294967295")
     endif()
 
@@ -45,12 +59,12 @@ macro(define_assigner_test test)
 endmacro()
 
 SET(ALL_TESTS_FILES
-    "signature_parser_test"
-    "input_reader_test"
-    )
+        "signature_parser_test"
+        "input_reader_test")
 
 foreach(TEST_FILE ${ALL_TESTS_FILES})
     define_assigner_test(${TEST_FILE})
 endforeach()
 
-target_compile_definitions(zkllvm_assigner_input_reader_test PRIVATE IR_FILE="${CMAKE_CURRENT_SOURCE_DIR}/ir/input_reader_test.ll")
+target_compile_definitions(zkllvm_assigner_input_reader_test
+        PRIVATE IR_FILE="${CMAKE_CURRENT_SOURCE_DIR}/ir/input_reader_test.ll")
